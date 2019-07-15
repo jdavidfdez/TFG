@@ -1,0 +1,1221 @@
+---
+# title: "TRABAJO FIN DE GRADO EN ESTADÍSTICA: Análisis de datos de naturaleza textual mediante técnicas multivariantes. Aplicaciones en minería de textos."
+# author: "J. David Fernández Romero"
+date: "7/6/2019"
+output: 
+    pdf_document:
+    keep_tex: true
+bibliography: bd_biblio.bib
+lang: es-ES
+geometry: margin=1.2in
+header-includes:
+  - \usepackage{fancyhdr}
+  - \fancyfoot[CO,CE]{My footer}
+  - \usepackage{color}
+  - \usepackage{colortbl}
+  - \usepackage{multicol}
+  - \usepackage{multirow}
+---
+<!-------------------------------------------------------------Portada------------------------------------------------------------->
+\thispagestyle{empty}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/logo_ugr.png}
+    \label{imagen2}
+\end{figure}
+\vspace{.5cm}
+\huge \textbf{Facultad de Ciencias}
+\vspace{3cm}
+\begin{center} \huge \textbf{Grado en Estadística} \end{center}
+\vspace{1cm}
+\begin{center} \Large \textbf{\textsc{TRABAJO FIN DE GRADO:}} \end{center}
+\vspace{0.5cm}
+\begin{center} \large \textbf{Análisis estadístico de datos textuales. Una aproximación exploratoria.} \end{center}
+
+\vspace{4cm}
+
+\large Presentado por: \textbf{D. José David Fernández Romero}  
+\vspace{0.1cm}  
+\large Tutor: \textbf{Profesor Dr. D. José Fernando Vera Vera}  
+\vspace{0.1cm}  
+\large Curso: \textbf{2018-2019}  
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=TRUE, warning=FALSE, message=FALSE, tidy=TRUE, eval=TRUE, fig.height=4, fig.keep="high", fig.show="hold", results="hold")
+options(tinytex.verbose = TRUE)
+```
+# Autoevaluación.  
+  
+El desarrollo del presente trabajo me ha permitido descubrir una manera de hacer estadística que era desconocida para mí: el análisis estadístico de textos.  
+
+En proceso de elaboración de este trabajo fin de grado ha sido necesario, en una primera fase, recapacitar sobre todo lo aprendido durante los estudios universitarios para plasmar, de alguna manera, las competencias adquiridas. 
+  
+Tomar como base algo tan novedoso para mí como los datos textuales, junto al hecho de que en su tratamiento se aplican, en definitiva, técnicas estadísticas _tradicionales_, me ha permitido profundizar en muchos conceptos previamente aprendidos y, al mismo tiempo, ampliar mi conocimiento sobre algunos de ellos.  
+
+Por otra parte, desde el momento inicial el desarrollo de este trabajo me ha aportado un nuevo punto de vista de la estadística que considero muy enriquecedor.  
+
+La realización de este trabajo ha conllevado una extensa búsqueda de información en distintas fuentes (desde el libro de texto de Mónica Bécue-Bertaut "Minería de textos. Aplicación a preguntas abiertas en encuestas." hasta un considerable número de publicaciones en researchgate.net pasando por portales de internet especializados en la minería de datos). Ha sido precisa una parte importante de trabajo autónomo para el aprendizaje de nuevos conceptos y como relacionarlos con lo ya aprendido. Además, la tarea, en cierto modo secundaria, pero imprescindible de realizar la aplicación a un conjunto de datos real mediante un programa informático especializado ha supuesto un reto en varios sentidos: en primer lugar en cuanto a la elección del programa mas apropiado, en segundo lugar, una vez elegido el software apropiado, en cuanto al aprendizaje de los módulos y librerías específicos para el tratamiento de datos textuales y, en tercer lugar, en cuanto al volumen del conjunto de datos objeto de estudio, que ha supuesto un auténtico reto en la fase final dedicada a las técnicas multivariantes.  
+
+El reto que ha supuesto enfrentar una materia novedosa y en gran parte desconocida junto a la _soledad_ consecuencia de la diversidad de tareas a realizar de manera autónoma ha resultado, sin embargo, en una satisfacción con el resultado final derivada de haber aumentado conocimientos y contrastado la capacidad de acometer tareas complejas que integran procedimientos de naturaleza muy diversa con resultados positivos.  
+
+En definitiva la realización de este trabajo, a través de la puesta en práctica de las competencias adquiridas en los estudios del Grado en Estadística, ha revertido en la consolidación de dichas competencias y en un conocimiento mas profundo de cara a futuras exigencias profesionales.  
+
+\newpage  
+
+# Abstract  
+
+In this graduate work I intend to present an approximation, from an exploratory point of view, to the analysis of data of a textual nature. This is a type of data with special characteristics that require, by their very nature, the application of very specific techniques within the set of multivariate techniques.  
+
+During my studies in the Degree in Statistics at the University of Granada, I have learned the different tools provided by statistics, based on a set of data: summarising, describing, selecting representative samples, adjusting mathematical models, making inference, reducing dimensionality, grouping data, etc.  
+  
+At the end of these studies and facing the challenge of doing the present work, I found several examples of the application of statistics to word processing. They immediately caught my attention, since up to that moment I had not considered how to approach the statistical treatment of, for example, a set of novels or, more in line with current times, the set of comments introduced in a web portal of recommendations.  
+
+After some first searches in Internet and after understanding the most important concepts to undertake this type of data I approached the learning of the process of analysis of data of textual nature and the search of a set of data on which to apply what I was learning.  
+
+This work begins with a review of the historical development of statistical analysis of textual data. This introduction highlights the importance of the French school and the development of factor analysis of correspondence and then describes the origin and evolution of multivariate analysis and the importance of matrix algebra in this type of techniques.  
+
+At the end of the introductory part, the _preprocessing_ stage is described, in which the textual data are prepared for their appropriate statistical treatment. The various applicable treatments are introduced here to codify the linguistic _corpus_ object of study in the corresponding tables appropriate for its statistical treatment. These procedures include the elimination of unwanted terms or terms considered of little interest and transformations such as the elimination of unwanted characters, the conversion of text to lower case or the elimination of grammatical signs.  
+
+The methods for carrying out the exploratory and descriptive analysis of a textual variable through the construction of the corresponding frequency tables and their treatment will be described below. The question of how to carry out comparative studies of different _corpus_ (or of several subsets of a corpus obtained from a third categorical variable) is also addressed.  
+  
+In the next stage of this work, correspondence analysis is described as a multivariate technique traditionally used for the analysis of textual data. We briefly introduce the _unfolding_ technique, derived from multidimensional scaling and its application possibilities to the study of textual data.  
+
+\newpage  
+
+Finally, the concepts and techniques presented are applied to a real data set. It is a set of wine reviews obtained from an Internet portal specialized in this field. The weight of the information falls on a descriptive textual variable that contains the reviews made by the users after the _tasting_ of the wines. In addition, there are two numeric variables that complete the information providing the score given to the wine and the price of the bottle. Initially, a brief descriptive analysis of the quantitative variables is carried out, followed by an analysis of the textual variable. To finish, the correspondence analysis is applied, interpreting the results obtained, and the _unfolding_ technique is illustrated with a small example.  
+\newpage  
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+
+# Introducción.  
+  
+_(Recursos utilizados para la elaboración de este capítulo: [@fundamentos; @analisis_textual; @terradez; @multivariante]_
+  
+## Estadística y variable textual.   
+
+La Estadística, tal y como la conocemos hoy en día, es el resultado de la fusión en el siglo XIX de dos disciplinas hasta entonces independientes: el _Cálculo de Probabilidades_ (nacido en el siglo XVII como teoría matemática para el estudio de los juegos de azar) y la _Estadística_ (disciplina mucho mas antigua, cuyo nombre proviene del latín _Status_ y que estudia la descripción de datos).  
+  
+La conjunción de ambas disciplinas origina una nueva ciencia dedicada a la obtención de conclusiones en la investigación empírica a través de la utilización de modelos matemáticos. De este modo, la Estadística establece un puente entre los modelos matemáticos y la realidad. Tal y como afirmó Mood en 1972: _la Estadística es la tecnología del método científico experimental_.   
+  
+La Estadística, en su concepción más tradicional, permite analizar datos cuantitativos y/o cualitativos pero, por otra parte, desde tiempos antiguos el ser humano ha estudiado minuciosamente textos (por razones principalmente lingüísticas).  
+  
+El origen de la analítica de textos se remonta a la antigua Alejandría, cuando los gramáticos elaboraron el inventario de palabras de la Biblia, así como listados de los _hapax_[^1] de Homero. Este primitivo análisis textual se centraba fundamentalmente en el tipo y volumen del vocabulario empleado, sin acometer el análisis del contenido de los documentos.  
+  
+Durante las primeras décadas del siglo XX, los lingüistas anglosajones abordaron el estudio de las concordancias de determinados vocablos en grandes autores literarios. Se trataba de inferir el contexto común alrededor de cada palabra. 
+  
+A partir de la década de 1930, Zipf, Yule y Guiraud entre otros, realizaron importantes aportes teóricos al análisis estadístico de datos textuales, introduciendo leyes empíricas sobre la distribución de las palabras y resolviendo así algunos problemas planteados por los estilistas[^2] franceses.  
+  
+En la actualidad, debido al desarrollo de la informática y las telecomunicaciones, son muchas las posibilidades de profundizar en el análisis de textos desde el punto de vista de su contenido y no únicamente del vocabulario. En este punto, es importante resaltar la diferencia entre el _análisis textual_ como concepto general y el _análisis estadístico de textos_ o simplemente _análisis de datos textuales_ que consiste en la aplicación a la lingüística de técnicas propias de la estadística.  
+
+\newpage  
+
+Podemos observar que existe una relación muy interesante entre la lingüística y la estadística, así como entre la lingüística y otras disciplinas como las matemáticas o la computación a partir de la división de la lingüística en ramas conexas establecida por el Doctor en Filología Hispánica y Profesor Asociado en el Departamento de Filología Española de la Universidad de Valencia Marcial Terrádez Gurrea [@terradez]:  
+  
+* __Lingüística Matemática__: Encargada de la fundamentación metódica de la lingüística y la formación teórica estricta, aplicando modelos matemáticos  
+  
+* __Lingüística Estadística (o Estadística Lingüística)__: Creada por los _estilistas_ para el estudio cuantitativo de obras literarias de grandes autores  
+  
+* __Lingüística Computacional__: Equivalente al procesamiento informático del lenguaje natural  
+  
+* __Ingeniería Lingüística__: Compuesta por las aplicaciones lingüísticas potencialmente comerciales utilizando nuevas tecnologías  
+  
+* __Lingüística Algebraica__: Encargada de la investigación y definición de gramáticas formales basadas en métodos algebraicos
+  
+## Origen del análisis de datos textuales: la lingüística matemática.  
+  
+Jean-Paul Benzécri, gran estadístico francés considerado el padre de la escuela francesa de análisis de datos, publicó en 1964 un curso de lingüística matemática que venía impartiendo en la Facultad de Ciencias de Rennes desde 1960. En él, Benzécri plantea un nuevo método de análisis descriptivo multivariante: la técnica del _Análisis Factorial de Correspondencias_. Al año siguiente y en esa misma facultad, Escofier defendía su tesis doctoral resaltando las principales propiedades de este método.  
+  
+Benzécri estaba muy influenciado por las corrientes lingüísticas del siglo XX, asociadas fundamentalmente a las teorías de Noam Chomsky (lingüista con formación matemática y filosófica) y de Zellig Harris (maestro del anterior). Este último, utilizando un procedimiento inductivo sistemático, describió la estructura del discurso, expresándola mediante símbolos algebraicos.  
+  
+Benzécri adoptó el sentido de Harris para desarrollar el nuevo método, inductivo y algebráico, del Análisis de Correspondencias para el tratamiento de grandes tablas de datos (originalmente lingüísticos, aunque actualmente con aplicación en multitud de ámbitos). Este origen lingüístico tiene su máxima expresión en el concepto de _equivalencia distribucional_, propiedad fundamental del Análisis de Correspondencias que se ilustrará mas adelante.  
+  
+Con el Análisis de Correspondencias, Benzécri aporta un método estadístico para solucionar los problemas fundamentales de los lingüistas. El Análisis de Correspondencias puede ser aplicado en muchos campos, pero debemos tener en cuenta que, en comparación, el tratamiento de datos lingüísticos presenta particularidades propias debidas a la multidimensionalidad intrínseca de esta materia.  
+
+En los años siguientes el desarrollo de programas informáticos corre paralelo al de los métodos y aplicaciones a grandes conjuntos de datos. L. Lebart y A. Morineau desarrollan, en 1984, un módulo de tratamiento de textos en el sistema SPAD. Posteriormente, en 1988, M. Bécue Bertaut presenta su tesis doctoral titulada _"Un sistema informático para el Análisis de Datos Textuales"_, en la que desarrolla el programa SPAD.T. A partir de entonces se realizan grandes progresos en el análisis de respuestas libres a cuestiones abiertas y su relación con el resto de variables informadas en las encuestas.  
+  
+A partir de los años ochenta del pasado siglo XX los métodos de análisis multivariante, y entre ellos el Análisis de Correspondencias, han experimentado un fuerte desarrollo en las más diversas áreas.  
+  
+En cuanto al análisis de datos textuales, en la actualidad se están produciendo múltiples interrelaciones entre distintos idiomas y tendencias, y además de perfeccionarse los campos de aplicación clásicos, estos se amplían continuamente. Se estudian particiones longitudinales de corpus, series de tiempo textuales y análisis discriminante textual. En lo que se refiere a las series de tiempo textuales las úlimas tendencias pretenden el tratamiento de datos textuales para realizar predicciones en los mercados financieros. En el análisis discriminante la idea que subyace es extraer los aspectos invariantes del texto que pueden permanecer ocultos al lector, y se emplea para, por ejemplo, atribuir un texto a un determinado autor o época. Por otra parte, la amplia aceptación de las redes sociales y su presencia en las aplicaciones de los teléfonos móviles actuales, está propiciando un fuerte desarrollo de las técnicas de minería de textos que, a través del tratamiento estadístico de grandes volúmenes de textos extraidos de dichas redes sociales, posibilita anticipar tendencias, análizar los sentimientos respecto de temas determinados, orientar acciones de marketing, etc...    
+  
+## Un poco de historia sobre el análisis de datos multivariantes.  
+  
+Podemos decir, citando a Daniel Peña, que _el análisis de datos multivariantes tiene por objeto el estudio estadístico de varias variables medidas en elementos de una población_[@multivariante]. Con este tipo de análisis se pretenden conseguir uno o varios de los siguientes objetivos:
+
+* Transformar el conjunto inicial de variables en un conjunto menor de variables, con la mínima pérdida de información.  
+* Descubrir grupos en los datos, si existen.    
+* Clasificar nuevas observaciones en grupos predefinidos.    
+* Establecer relaciones entre dos conjuntos de variables.    
+  
+\newpage  
+
+El análisis multivariante se inicia cuando Hotelling, tras colaborar con Fisher en estudios de investigación sobre tratamientos agrícolas en función de varias variables, descubre el paralelismo entre este problema y el planteado por Pearson para determinar si dos grupos de personas, de los que se conocen diversas medidas físicas, pertenecen a la misma raza. Hotelling desarrolla, en 1931, el contraste que lleva su nombre, mediante el cual podemos determinar si dos muestras multivariantes provienen de la misma población. En 1933, Hotelling desarrolla el concepto de componentes principales, como indicadores para resumir de manera óptima un conjunto amplio de variables, y que posteriormente da origen al análisis factorial. Posteriormente, Hotelling generaliza el método de componentes principales introduciendo el análisis de correlaciones canónicas, por el que es posible resumir dos conjuntos de variables de forma simultánea.  
+  
+Es interesante hacer notar que el problema de encontrar el indicador que mejor resume un conjunto de variables ya había sido abordado y resuelto por Pearson en 1921, aunque desde otra perspectiva puesto que trabajaba en encontrar el plano de mejor ajuste a un conjunto de observaciones astronómicas.  
+  
+Respecto del segundo objetivo perseguido con el análisis multivariante, el problema de la _clasificación_ fue resuelto inicialmente por Fisher en 1933 que, basándose en el análisis de la varianza encuentra, establece un método para determinar si un cráneo encontrado en una excavación arqueológica pertenecía a un homínido o no, al encontrar una variable (combinación lineal de las variables medidas originalmente) con la que se obtiene la máxima separación entre dos poblaciones (en este caso, homínidos y no homínidos).  
+
+Estas ideas, desarrolladas para variables cuantitativas, se extienden poco después al estudio de variables cualitativas. Pearson había desarrollado el contraste de independencia para tablas de contingencia y Fisher, aplicó sus ideas sobre el análisis discriminante a estas mismas tablas. A partir de este momento, en la década de los años 60, un grupo de estadísticos y lingüistas franceses comienzan a estudiar tablas de asociación entre textos literarios y Benzécri, como se ha expuesto en la introducción, desarrolla el método del análisis de correspondencias.  
+  
+La aparición del ordenador personal y el potente desarrollo de la informática propicia, a partir de la década de los 70, un fuerte crecimiento de los métodos de análisis multivariante.  
+
+## El álgebra matricial como base del análisis multivariante.  
+  
+Un conjunto de datos sobre el que aplicar un análisis multivariante consistirá en una tabla formada por diversos individuos (elementos de un conjunto) y distintas variables medidas sobre los mismos. Para simplificar la manipulación de estos conjuntos de datos se emplea el concepto de matriz y sus propiedades matemáticas.  
+  
+No puede ser el objetivo de este trabajo presentar una descripción detallada del álgebra de matrices y sus métodos, ampliamente estudiados en el Grado en Estadística, pero es importante destacar, en este punto, el papel fundamental del concepto de _vector_ como representación geométrica en un espacio _n-dimensional_ de los valores numéricos correspondientes a las _n_ variables medidas sobre un individuo del conjunto de estudio. Así, podemos disponer los datos de _m_ elementos sobre los que se han medido _n_ variables en una tabla rectangular de _m_ filas y _n_ columnas. En esta tabla cada columna contendrá los valores de una variable sobre los _m_ individuos y a su vez cada fila contendrá los valores pora un individuo de las _n_ variables medidas.  
+  
+El primer objetivo del análisis multivariante es, como indicábamos en el apartado anterior, reducir el número de variables con la mínima perdida de información, lo que nos conduce inmediatamente al estudio de la dependencia lineal entre las _n_ variables que se llevará a cabo, a _grosso modo_ mediante la matriz de covarianzas y/o de correlaciones, matrices cuadradas {nxn} sobre las que se definen los conceptos de _vectores y valores propios_. Los _valores propios_ son las medidas básicas de tamaño de una matriz, invariantes ante cambios de coordenadas (equivalentes, geométricamente, a rotaciones de los ejes). Por su parte, los _vectores propios_ representan las direcciones características de la matriz y, aunque no son invariantes respecto a su norma (longitud) si lo son respecto a su posición en el espacio. Estas propiedades son fundamentales para la aplicación de las diversas técnicas multivariantes de análisis de datos.  
+  
+\newpage  
+
+# Preprocesado y codificación de la variable textual.  
+
+_(Bibliografía utilizada para la elaboración de este capítulo: [@min_textos])_  
+
+La variable textual, como ya se ha indicado, no es directamente tratable mediante técnicas estadísticas, pues se precisa su transformación en una tabla multivariante. Además, la variable textual, aún expresada en tablas de recuentos, implica una mayor complejidad en su forma que las variables cuantitativas o cualitativas "puras". Sin embargo, esta complejidad junto a la dificultad de tratamiento de este tipo de variables aporta un mayor apego a la realidad de los resultados obtenidos.  
+
+## Preprocesamiento del corpus y segmentación en unidades léxicas.  
+
+Llamamos _corpus_ al conjunto de textos a analizar (artículos de opinión, relatos de diversos autores o épocas, comentarios en una red social, etc).  
+
+Es fundamental realizar un cuidadoso preproceso del corpus para identificar correctamente las unidades léxicas  y sus ocurrencias. Es conveniente que este preproceso esté formado por una serie de reglas bien definidas que aporten estabilidad, facilidad de comprensión y reproducibilidad. En este sentido, podemos seguir la norma lexicométrica desarrollada por Muller en 1977 y posteriormente completada por Labbé en 1990, que contempla:  
+
+* Utilizar un corrector ortográfico automático potente que tenga en cuenta las reglas gramaticales.  
+* Realizar una limpieza de notaciones normativas (eliminando por ejemplo, las mayúsculas al inicio de frases o las abreviaciones ambiguas). Se trata, en definitiva, de dotar de un estatus único a cada carácter del texto (por ejemplo, el punto que indica el fin de una frase es diferente del punto que separa ciertas abreviaciones como D.N.I. o N.I.E.).  
+* Definir los signos considerados de puntuación, de manera que todos los demás signos son tratados como parte del conjunto de las letras.  
+* Si se considera necesario, _lematizar_ el corpus, es decir, transformar cada palabra en la \textit{entrada del diccionario} a la que se asocia.  
+* Definir lo que se conoce como _stoplist_ (o conjunto de _stopwords_), que no es mas que la lista de palabras que se eliminan del estudio por considerar que no aportan información (resulta habitual eliminar las preposiciones, artículos y conjunciones).  
+* En estudios _comparativos_, tales como en el análisis de emociones o el análisis de encuestas con preguntas abiertas, es común establecer un \textit{umbral de frecuencia}, ya que se considera que la comparación sólo tendrá sentido entre palabras que se utilicen con al menos una determinada frecuencia.  
+
+### Lematización.  
+La principal dificultad al acometer el preproceso de todo corpus es la definición de la unidad léxica, o _unidad de segmentación_ del corpus, puesto que será la base del análisis estadístico que vamos a realizar.  
+
+Podríamos adoptar la _palabra_, en su concepción lexicógrafica como secuencia de letras delimitada a izquierda y derecha por espacio en blanco o signo de puntuación, (también denominada forma gráfica), pero así no obtendríamos una unidad léxica claramente determinada, por lo que se suele optar por el _lema_[^3].  
+
+En el caso del idioma _castellano_ la lematización de un texto requiere convertir:  
+
+* las flexiones verbales al infinitivo  
+* los sustantivos a singular  
+* los adjetivos al masculino singular  
+
+Aun cuando se utilice un analizador morfosintáctico de alta calidad para automatizar el proceso de lematización, pueden subsistir ambigüedades únicamente solventables mediante una operación manual.  
+
+La lematización del corpus previa a su análisis estadístico proporciona las siguientes ventajas:  
+
+* Se reduce la variabilidad entre respuestas: las frases "_me gusta ver series_" y "_por la noche veo una serie_" tienen en común los lemas "_ver_" y "_serie_", pero en su forma original no comparten ninguna forma gráfica   
+* Se limita la pérdida de unidades textuales, puesto que la frecuencia de cada lema considerado será la suma de las frecuencias de las formas gráficas reagrupadas en el lema: en un texto en el que aparezca 18 veces la forma gráfica _permanencia_, 1 vez _permanecen_, 3 veces _permaneciendo_ y 5 veces _permaneceremos_, el lema _permanecer_ tendrá una frecuencia de 27 ocurrencias, cuando ninguna de las formas gráficas alcanza este umbral  
+* Se asocia a cada lema (o forma gráfica) su categoría sintáctica, aspecto fundamental en diversos momentos del tratamiento, puesto que hace posible seleccionar palabras por su categoría o utilizar la categoría para _apoyar_ la interpretación de los resultados  
+
+Es aconsejable tomar en consideración ambos tipos de unidad léxica (palabra o forma gráfica, y lema) repitiendo incluso las distintas fases del tratamiento en cada caso puesto que los resultados obtenidos se enriquecerán mutuamente.  
+
+\newpage  
+
+### Stoplist.  
+
+En determinados casos se separan las unidades léxicas consideradas en dos grupos: las consideradas _llenas_ (que aportan significado por sí solas, como los sustantivos y los verbos, y a veces pero no siempre, los adjetivos y los adverbios) y las consideradas _herramientas_ (o gramaticales, no consideradas informativas, tales como los artículos, las preposiciones y las conjunciones). En algunas aplicaciones las unidades léxicas gramaticales se consideran no útiles.  
+
+El conjunto de palabras consideradas no útiles se denomina _stoplist_, pero debe tenerse en cuenta que en determinados casos, como el caso de las respuestas libres de encuestas, los adverbios, las negaciones o los adjetivos, no deben eliminarse del tratamiento puesto que pueden ser extremadamente importantes.  
+
+### Unidad léxica compuesta: el segmento repetido.  
+Al considerar unidades léxicas compuestas se obtiene un aumento del número de unidades léxicas distintas y con ello, se reduce el vocabulario común de los diferentes textos. Para paliar este efecto podemos considerar como unidad compuesta el _segmento repetido_ (sucesión idénticamente repetida de unidades léxicas no separadas por un signo de puntuación fuerte).  
+ 
+La segmentación del corpus en unidades léxicas y la segmentación en segmentos repetidos no tienen el mismo estatus, puesto que el texto inicial se puede considerar la concatenación de ocurrencias de las unidades léxicas individuales, mientras que su segmentación en segmentos repetidos produce unidades léxicas que se solapan (por ejemplo, la expresión "yo leo" puede constituir un segmento repetido que se solapará con "yo leo novelas" o "yo leo biografías").  
+
+### _Stematización_ y/o reagrupación de sinónimos.  
+Puede resultar de utilidad realizar una _stematización_[^4], consistente en el reagrupamiento de varios lemas provenientes de una misma raíz.  
+
+También, en determinados estudios, puede ser apropiada la unificación de sinónimos.  
+
+Debemos tener en cuenta que estos reagrupamientos deben realizarse con posterioridad a un primer tratamiento para garantizar que no se distorsionen los resultados.  
+
+### Umbral de frecuencia.  
+El último concepto importante relacionado con el preproceso del corpus es el que hace referencia a la determinación de una frecuencia mínima de presencia en el corpus para que la unidad léxica sea considerada en el estudio. A veces se sustituye por el establecimiento _a priori_ del número de palabras a incluir.  
+
+## Codificación del texto y tablas léxicas.  
+Una vez realizada la fase de preproceso mediante la segmentación del corpus en unidades léxicas y, en su caso, operadas la eliminación de las incluidas en la stoplist y las reagrupaciones necesarias, obtendremos los _glosarios_, tanto de unidades léxicas como de segmentos repetidos.  
+
+Las tablas generadas permiten estudiar la distribución de las palabras entre individuos[^5] (_tabla léxica_: cruzando individuos y palabras) o entre categorías de individuos (_tabla léxica agregada_: cruzando categorías de individuos y palabras).  En adelante, para una mejor adecuación de _la terminología utilizada al caso de aplicación, se utilizará el término _documento_ como equivalente a _individuos_.
+
+### Tabla léxica $Documentos x Palabras$  
+
+Para acometer el estudio de la distribución del vocabulario entre los documentos se codifica la variable textual en una tabla de frecuencias $Documentos x Palabras$ que contiene el número de veces que en cada documento aparece cada una de las palabras.  
+  
+### Tabla léxica agregada $Palabras x Categorías$  
+
+En determinadas ocasiones puede resultar de interés la comparación de la distribución de palabras entre categorías de documentos, en función de una variable categórica. En este caso, para cada categoría se cuenta el número de veces que cada palabra aparece en los documentos de la categoría, es decir, se agregan los documentos por categorías, obteniendo una tabla léxica agregada $Palabras x Categorías$.  
+  
+\newpage  
+
+# Descripción estadística de la variable textual.  
+
+_(Bibliografía utilizada para la elaboración de este capítulo: [@min_textos])_  
+  
+## Glosarios y concordancias.  
+  
+El primer paso en el análisis estadístico de un texto, una vez _preprocesado_, consiste en la identificación de las palabras que lo forman y el cálculo de su frecuencia. Se obtienen así los _glosarios_ de palabras o _lemas_, cuyo estudio puede completarse con las _concordancias_ de determinadas palabras de interés con el objetivo de precisar su significado mediante el conocimiento del contexto en el que se utilizan.  
+
+En esta fase inicial será por lo tanto de interés calcular indicadores como:  
+  
+* Nº de documentos que forman el _corpus_ objeto de estudio  
+* Nº total de palabras incluidas en el _corpus_  
+* Nº de términos distintos  
+* Nª de segmentos repetidos  
+  
+La observación del listado de términos (alfabético y ordenado por frecuencias) permite al investigador detectar términos que puede ser necesario considerar equivalentes o que, no habiendo sido incluidos entre las _stopwords_ durante el preprocesamiento, se decida en este momento eliminar del estudio.  
+Además, la observación de los términos y sus frecuencias de aparición proporcionará una primera idea general acerca del _corpus_ estudiado determinando, por ejemplo, si se trata de un _corpus_ de temática general o en el que predomina terminología específica de un tema concreto, o si su vocabulario es relativamente rico o en cierto modo repetitivo.  
+
+Es habitual obtener también los glosarios de _segmentos repetidos_ y proceder a su vez al recuento de las frecuencias junto a la observación de los listados profundizando así en el conocimiento del _corpus_.   
+
+Con la observación de los glosarios y de los términos (y en su caso, segmentos repetidos) mas frecuentes, el investigador obtiene una idea general sobre el sentido que predomina en aquellos aspectos del texto que interesa estudiar. En ocasiones, esto conduce a la necesitad de conocer los contextos en los que se están utilizando determinados términos. Para ello, se extraen listados de _concordancias_, que consisten en el listado sistemático de todos los contextos de una determinada palabra, entendiendo por _contexto_ un determinado número de caracteres hacia izquierda y derecha de la palabra en el texto.  
+  
+## Medidas estilísticas.  
+  
+### Distribución de las frecuencias: la ley de Zipf.  
+  
+Además de proporcionar una primera idea general sobre el _corpus_ objeto de estudio, como ya hemos indicado en el punto anterior, la distribución de las frecuencias de los términos permite al investigador realizar comparaciones entre _corpus_, entre documentos, o entre subconjuntos del _corpus_ (por ejemplo los generados en atención a una variable auxiliar categórica), permitiendo cuantificar su grado de semejanza en cuanto al uso del vocabulario.  
+
+Es frecuente, cuando se estudian _corpus_ lingüísticos procedentes de _lenguaje natural_ obtener distribuciones de frecuencias con unos pocos términos de elevada frecuencia y un conjunto mucho más amplio de términos poco frecuentes, que generan histogramas de frecuencias muy desplazados a la izquierda, con un fuerte apuntamiento y una larga cola a la derecha.  Este tipo de distribuciones son tan comunes en los textos procedentes de lenguaje natural que la relación entre la frecuencia de un término y su rango ha sido frecuente objeto de estudio. En 1935, G. Zipf observó que las gamas de frecuencia procedentes de distintos corpus mostraban características estables, de manera que la frecuencia con la que aparece una palabra es inversamente proporcional a su rango, haciendo que el producto {rango x frecuencia} sea practicamente constante.  
+  
+### Riqueza del vocabulario.  
+  
+Una primera aproximación al grado de _riqueza_ del vocabulario se puede obtener al calcular el cociente entre el número de palabras distintas y el número total de palabras que forman el _corpus_.  
+
+#### Ley de Heaps.  
+Una forma sencilla de medir la riqueza del vocabulario empleado en un _corpus_ lingüístico es la propuesta por Herdan en 1964. Se trata de calcular el ratio $log(V)/log(T)$, siendo V el número de palabras distintas y T el número total de palabras del _corpus_.
+  
+Nótese que este ratio es muy sensible al tamaño del corpus y, por lo tanto, no será de utilidad para comparar distintos _corpus_ o subconjuntos de un mismo _corpus_ entre sí cuando tienen longitudes distintas.  
+  
+Para solucionar este problema Muller propuso, en 1977, recortar los distintos textos que se desea comparar a la longitud del mas corto de ellos (denominado T). Para cada texto original se calcula el tamaño teórico del vocabulario correspondiente si su longitud fuese la de T, formando todos los textos posibles de longitud T mediante extracciones aleatorias con reposición de las palabras del texto original. El tamaño teórico del vocabulario será entonces la media de los tamaños de los textos así formados.  
+  
+\newpage  
+Por su parte, Labbé y Hubert en 1994 establecieron otro método que soluciona el problema descrito. Se establece un tamaño estandar para los textos (por ejemplo, mil palabras) y, para cada texto, se obtienen todos los fragmentos contiguos de este tamaño, calculando la media del número de palabras distintas por fragmento y comparando finalmente las medias calculadas para los distintos textos.  
+  
+## Palabras características.  
+  
+En los análisis estadísticos de _corpus_ de texto que aborden un estudio _comparativo_ entre distintos _corpus_ o subconjuntos de un mismo _corpus_, o bien pretendan _clasificar_ los individuos (o documentos) en varios grupos, resultará de interés obtener las palabras características de cada uno de los _corpus_, _subcorpus_ o grupos, es decir, las palabras con frecuencia anormalmente alta en un determinado grupo respecto de su frecuencia global.  
+  
+Uno de los métodos que se utiliza para identificar las palabras características de un determinado _subcorpus_ es multiplicar la frecuencia de cada término por un factor corrector denominado _idf: inverse document frequency_ que se obtiene mediante el logaritmo del cociente entre el número total de documentos y el número de documentos que contienen el término.   
+
+Así, la frecuencia de documento inversa para un término dado se define como:  
+  
+  \[idf(termino)=ln(\frac{n_{documentos}}{n_{documentos que contienen termino}})\]  
+  
+Hay que tener en cuenta que este indicador permite detectar el vocabulario que caracteriza un subconjunto en comparación con el conjunto total, por lo que no debe interpretarse para comparar subconjuntos entre sí estableciendo parecidos entre los mismos. El valor de este indicador radica en su utilidad, junto con las adecuadas técnicas multivariantes para la interpretación de los resultados.  
+  
+\newpage  
+
+# El Análisis de Correspondencias.  
+  
+_(Recursos utilizados para la elaboración de este capítulo: [@multivariante]_
+  
+Existen muy diversas técnicas que forman parte del Análisis de Datos multivariable, entre las que cabe destacar las técnicas factoriales y las técnicas de clasificación automática.  En este trabajo se ilustra, a partir del conjunto básico de ideas y métodos que conforman el Análisis Factorial General, la aplicación al análisis estadístico de datos textuales del análisis de correspondencias.  
+En general, las técnicas factoriales pretenden resolver, siguiendo determinados criterios, el problema de aproximar una matriz inicial de datos $X$ mediante un número menor de valores numéricos. Esta aproximación se realiza con matrices de bajo rango mediante aproximación por mínimos cuadrados, lo cual se consigue a través de la descomposición en valores singulares.  
+
+Asi, en el análisis factorial general, se resuelve esta cuestión mediante los autovalores-autovectores de $X'X$ y de $XX'$.  
+
+El análisis de correspondencias se enfoca al estudio de tablas de contingencia en las que, en principio, se miden frecuencias. Así, se tienen valores numéricos $k_{ij}$ que representan el número de individuos pertenecientes a la clase $i$ de la característica $I$ y a la clase $j$ de la característica $J$. Entonces, tanto $I$ como $J$ clasifican o particionan la población objeto de estudio. En este tipo de tablas (de contingencia) no tendrá sentido, por tanto, distinguir entre variables e individuos, jugando ambos un papel simétrico.  
+
+La tabla inicial necesitará ser transformada de la forma adecuada para que, en función de su naturaleza y características particulares, sea posible aplicar los métodos propios del Análisis Factorial General.  
+
+Dada una tabla inicial de contingencia:  
+
+|       | $1$ | ... | $j$ | ... | $J$ |    |  
+  | :---- | --------- | --- | --------- | --- | --------- | -: |  
+  | $1$ | $k_{11}$ | ... | $k_{1j}$ | ... | $k_{1J}$ | $k_{1.}$ |  
+  | ... | ... | ... | ... | ... | ... | ... |  
+  | $i$ | $k_{i1}$ | ... | $k_{ij}$ | ... | $k_{iJ}$ | $k_{i.}$ |  
+  | ... | ... | ... | ... | ... | ... | ... |  
+  | $I$ | $k_{I1}$ | ... | $k_{Ij}$ | ... | $k_{IJ}$ | $k_{I.}$ |  
+  |            | $k_{.1}$ | ... | $k_{.j}$ | ... | $k_{.J}$ | $K$ |  
+  
+\newpage  
+consideraremos la tabla transformada conocida como tabla o matriz de correspondencias: 
+  
+|            | $1$ | ... | $j$ | ... | $J$ |  
+  | :--------- | --------- | --- | --------- | --- | --------: |  
+  | $1$ | $\frac{k_{11}}{K}$ | ... | $\frac{k_{1j}}{K}$ | ... | $\frac{k_{1J}}{K}$ |  
+  | ... | ... | ... | ... | ... | ... | ... |  
+  | $i$ | $\frac{k_{i1}}{K}$ | ... | $\frac{k_{ij}}{K}$ | ... | $\frac{k_{iJ}}{K}$ |  
+  | ... | ... | ... | ... | ... | ... | ... |  
+  | $I$ | $\frac{k_{I1}}{K}$ | ... | $\frac{k_{Ij}}{K}$ | ... | $\frac{k_{IJ}}{K}$ |    
+  
+Se realiza esta transformación para eliminar el efecto que, sobre el cálculo de distancias entre puntos fila (o puntos columna), tiene el efectivo total de cada fila (o columna).  
+
+### El concepto de equivalencia distribucional.  
+
+Si consideramos un conjunto de datos representado mediante una tabla rectangular $IxJ$ en la que las filas representan _nombres_ y las columnas _verbos_ (o adjetivos), tal que la intersección de la fila _i_ con la columna _j_ contiene el número de veces que $Nombre_{i}$ se asocia a $Verbo_{j}$, denotado como $k_{ij}$, la asociación será más fuerte cuanto mayor sea $k_{ij}$.  
+  
+
+|       | $Verbo_1$ | ... | $Verbo_j$ | ... | $Verbo_J$ |    |  
+| :---- | --------- | --- | --------- | --- | --------- | -: |  
+| $Nombre_1$ | $k_{11}$ | ... | $k_{1j}$ | ... | $k_{1J}$ | $k_{1.}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_i$ | $k_{i1}$ | ... | $k_{ij}$ | ... | $k_{iJ}$ | $k_{i.}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_I$ | $k_{I1}$ | ... | $k_{Ij}$ | ... | $k_{IJ}$ | $k_{I.}$ |  
+|            | $k_{.1}$ | ... | $k_{.j}$ | ... | $k_{.J}$ | $k_{..}$ |  
+\begin{center} \small Tabla de asociación Nombre-Verbo  \end{center}
+
+Resultará de interés estudiar, para cada $Nombre_{i}$, la _fortaleza relativa_ de la asociación $k_{ij}$ respecto de los verbos, es decir, el cociente $k_{ij}/k_{i.}$ (siendo $k_{i.}$ la suma de la fila _i_).  
+
+
+|            | $Verbo_1$ | ... | $Verbo_j$ | ... | $Verbo_J$ |  
+| :--------- | --------- | --- | --------- | --- | --------: |  
+| $Nombre_1$ | $\frac{k_{11}}{k_{1.}}$ | ... | $\frac{k_{1j}}{k_{1.}}$ | ... | $\frac{k_{1J}}{k_{1.}}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_i$ | $\frac{k_{i1}}{k_{i.}}$ | ... | $\frac{k_{ij}}{k_{i.}}$ | ... | $\frac{k_{iJ}}{k_{i.}}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_I$ | $\frac{k_{I1}}{k_{I.}}$ | ... | $\frac{k_{Ij}}{k_{I.}}$ | ... | $\frac{k_{IJ}}{k_{I.}}$ |    
+\begin{center} \small Tabla de fortaleza relativa de la asociación Nombre-Verbo  \end{center}
+
+\newpage  
+Denominamos entonces _"perfil"_ de $Nombre_{i}$ a la sucesión de valores $k_{ij}/k{i.}$ para todos los verbos, (j:1,...,J).  
+
+\[perfil(Nombre_{i})=\left(\frac{k_{i1}}{k_{i.}}\,,\,\frac{k_{i2}}{k_{i.}}\,,\,\ldots\,,\,\frac{k_{iJ}}{k_{i.}}\right)\]  
+
+Análogamente, podemos estudiar, para cada $Verbo_{j}$, la _fortaleza relativa_ de la asociación $k_{ij}$ respecto de los nombres, es decir, el cociente $k_{ij}/k_{.j}$ (siendo $k_{.j}$ la suma de la columna _j_).  
+
+
+|            | $Verbo_1$ | ... | $Verbo_j$ | ... | $Verbo_J$ |  
+| :--------- | --------- | --- | --------- | --- | --------: |  
+| $Nombre_1$ | $\frac{k_{11}}{k_{.1}}$ | ... | $\frac{k_{1j}}{k_{.j}}$ | ... | $\frac{k_{1J}}{k_{.J}}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_i$ | $\frac{k_{i1}}{k_{.1}}$ | ... | $\frac{k_{ij}}{k_{.j}}$ | ... | $\frac{k_{iJ}}{k_{.J}}$ |  
+| ... | ... | ... | ... | ... | ... | ... |  
+| $Nombre_I$ | $\frac{k_{I1}}{k_{.1}}$ | ... | $\frac{k_{Ij}}{k_{.j}}$ | ... | $\frac{k_{IJ}}{k_{.J}}$ |    
+\begin{center} \small Tabla de fortaleza relativa de la asociación Verbo-Nombre  \end{center}
+
+Y definiremos el _"perfil"_ de $Verbo_{j}$ como la sucesión de los valores $k_{ij}/k_{.j}$, para todos los nombres (i:1,..,I).  
+
+\[perfil(Verbo_{j})=\left(\frac{k_{1j}}{k_{.j}}\,,\,\frac{k_{2j}}{k_{.j}}\,,\,\ldots\,,\,\frac{k_{Ij}}{k_{.j}}\right)\]  
+
+El problema inmediato de cuantificar el grado de similitud entre perfiles, tanto para los _nombres_ como para los _verbos_, lleva aparejado el de la representación espacial del conjunto de perfiles, para lo cual fijamos una métrica euclídea, puesto que vamos a considerar las filas de la tabla como puntos o vectores de un espacio y las columnas como formas lineales o vectores de un espacio dual.  
+
+__Principio de equivalencia distribucional:__ _La distancia entre dos nombres ($i,i'$) se mantiene constante si se identifican dos verbos ($j,j'$) que son sinónimos en cuanto a su distribución._   
+
+Por el principio anterior y la exigencia en la geometría euclidiana multidimensional de que la distancia sea cuadrática, se define la distancia entre el perfil de la fila $i$ y el perfil de la fila $i'$ como:  
+
+\[d^2(i,i')=\sum_{j=1}^{J}\frac{k}{k_{.j}}\left(\frac{k_{ij}}{k_{i.}}-\frac{k_{i'j}}{k_{i'.}}\right)^2\,,\,k=k_{..}=\sum_{i=i}^{I}\sum_{j=i}^{J}k_{ij}\]
+\newpage  
+Esta distancia es conocida como _distancia $\chi^2$_ por su similitud con la prueba $\chi^2$ clásica.  
+
+En el Análisis de Correspondencias, gracias al concepto de equivalencia distribucional, una suficiente proximidad entre los perfiles de dos filas (o columnas) permite sustituirlas por una única fila (o columna) como agregación de las anteriores sin que los resultados se vean sensiblemente alterados.  
+  
+\newpage  
+
+# Caso práctico: _Wine reviews_  
+
+Para ilustrar el análisis estadístico de datos textuales utilizaremos el conjunto de datos _Wine reviews_ disponible en el portal web [Kaggle](https://www.kaggle.com)[^6]. Este conjunto está formado por mas de 130.000 reseñas de vinos obtenidas en el año 2007 en el portal especializado [WineEnthusiast](https://winemag.com).  
+
+Cada reseña aporta información sobre:  
+
+  + PAIS, PROVINCIA, REGIÓN 1 y REGIÓN 2 de origen del vino  
+  + VARIEDAD de uva empleada en la elaboración del vino  
+  + BODEGA que produce el vino  
+  + NOMBRE del vino    
+  + DESCRIPCIÓN del vino  
+  + PUNTOS asignados al vino  
+  + PRECIO de la botella  
+  
+El objetivo de este trabajo es ilustrar el análisis estadístico de la variable textual (DESCRIPCION) y por tanto descartaremos las demás variables a excepción de PUNTOS y PRECIO, que mantenemos para analizar si el vocabulario empleado en las _reseñas_ caracteriza la puntuación y/o el precio del vino.   
+
+Comenzaremos estudiando las variables PUNTOS y PRECIO para a continuación acometer el análisis de los datos textuales. Para estudiar la asociación entre el vocabulario empleado y la puntuación y/o el precio del vino, compararemos los _subcorpus_ resultantes de transformar las variables PUNTOS y PRECIO en variables categóricas del siguiente modo:  
+  
+* Se ha codificado una nueva variable, RANGO_PTOS, a través de las siguientes categorías:  
+  + Q1_PTOS: Vinos con puntuación en el cuartil inferior  
+  + PTOS_MED: Vinos con puntuación en los cuartiles intermedios  
+  + Q4_PTOS: Vinos con puntuación en el cuartil superior  
+* Asimismo, se ha codificado una nueva variable, RANGO_PRECIO, mediante las siguientes categorías:  
+  + BARATO: Vinos con precio en el cuartil inferior para su nivel de puntuación    
+  + PRECIO_MED: Vinos con precio en los cuartiles intermedios respecto de su nivel de puntuación   
+  + CARO: Vinos con precio en el cuartil superior para su nivel de puntuación  
+  
+```{r include=FALSE, echo=FALSE}
+setwd("~/Documents/TFG/R") # directorio de trabajo
+
+source("librerias.r") # librerias
+
+load("TFG.RData") # TFG.RData contiene todos los objetos de resultados parciales que se encuentran precedidos de # para agilizar el proceso de compilación y no tener que recalcular todo cada vez que se genera el pdf
+
+# datos<-carga_datos()
+``` 
+  
+## Descripción de las variables cuantitativas.  
+  
+```{r echo=FALSE}
+ecos<-c("PUNTOS","PRECIO","MEDIDAS DE FORMA")
+ecos[1]
+summary(datos$PUNTOS)
+ecos[2]
+summary(datos$PRECIO)
+
+ecos[3]
+# df<-data.frame(ASIMETRIA=c(round(skewness(datos$PUNTOS),4),round(skewness(datos$PRECIO),4)),
+#           CURTOSIS=c(round(kurtosis(datos$PUNTOS),4),round(kurtosis(datos$PRECIO),4)))
+# row.names(df)<-c("PUNTOS","PRECIO")
+df
+
+```
+  
+La variable PUNTOS se mueve entre 80 y 100. El cuartil inferior corresponde a vinos con hasta 86 puntos, la puntuación mediana se situa en 88 y el cuartil superior corresponde a los vinos superan los 91 puntos.  
+Los precios se mueven entre 4 y 3300 dólares, situándose la mediana en 25, el primer cuartil en 17 y el tercero en 42.  
+  
+Mediante los histogramas de frecuencias y los diagramas de caja para estas variables visualizamos la situación de asimetría apuntada por los estadísticos anteriores y la existencia de posibles valores anómalos, especialmente en cuanto a la variable PRECIO.  
+  
+```{r echo=FALSE}
+# gg1<-datos %>%
+#   count(PUNTOS) %>%
+#   ggplot(aes(x = factor(PUNTOS), y = n, fill = factor(PUNTOS))) +
+#   geom_col(color = "black") +
+#   scale_fill_brewer(palette="Paired") +
+#   labs(x = "Puntuación", y = "Número de vinos") +
+#   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, face = "bold", size=12))
+# 
+# gg_box1<-ggplot(datos,aes(y=PUNTOS)) + geom_boxplot(outlier.colour="red",outlier.shape=16, outlier.size=2, notch=FALSE)
+
+grid.arrange(gg1,gg_box1,ncol=2)
+# 
+# guarda(gg1,"histograma_ptos.png","graficos/histogramas")
+# 
+```
+  
+El histograma muestra la asimetría a la izquierda provocada por la escasa presencia de vinos con mas de 96 PUNTOS. Además se observa una concentración en torno a la mediana relativamente fuerte. El diagrama de caja confirma estas conclusiones indicando como posibles _outliers_ los vinos con 99 o 100 puntos.  
+  
+```{r echo=FALSE}
+
+# gg2<-datos %>%
+#   count(PRECIO) %>%
+#   ggplot(aes(x = factor(PRECIO), y = n, fill = factor(PRECIO))) +
+#   geom_col(color = "black") +
+#   scale_fill_brewer(palette="Paired") +
+#   labs(x = "Precio", y = "Número de vinos") +
+#   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, face = "bold", size=12))
+# 
+# gg_box2<-ggplot(datos,aes(y=PRECIO)) + geom_boxplot(outlier.colour="red",outlier.shape=16, outlier.size=2, notch=FALSE)
+
+grid.arrange(gg2,gg_box2,ncol=2)
+
+```
+  
+El histograma de frecuencias de la variable PRECIO muestra una fuerte asimetría a la izquierda junto con una fuerte concentración de valores en torno a la mediana. El diagrama de caja muestra además la presencia de un número considerable de posibles valores anómalos que se encuentran distribuidos de manera bastante dispersa.  
+
+### Relación entre la puntuación y el precio de los vinos.    
+
+Podemos valorar visualmente la posibilidad de una relación entre las variables PUNTOS y PRECIO mediante la nube de puntos poblacional. Además representamos también la correspondiente a los precios medios por puntuación.  
+
+```{r echo=FALSE}
+# gg3<-ggplot(datos,aes(x=PUNTOS,y=PRECIO,color=RANGO_PRECIO))+
+#   geom_point()+
+#   labs(x="Puntos", y="Precio") 
+
+gg3
+
+# subdatos1<-ddply(datos,.(PUNTOS),summarize,PRECIO=mean(PRECIO),RANGO=min(RANGO_PTOS))
+# gg4<-ggplot(subdatos1,aes(x=PUNTOS,y=PRECIO,color=RANGO))+
+#   geom_point()+labs(x="Puntos", y="Precio")
+
+gg4
+```
+  
+De la observación de estos gráficos se intuye la existencia de una cierta relación lineal positiva, es decir, a mayor puntuación otorgada a un vino, mayor precio.  
+  
+Calculamos la covarianza y el coeficiente de correlación entre estas variables.  
+
+```{r echo=FALSE}
+txt<-c("COVARIANZA","CORRELACIÓN","PUNTOS - PRECIO","PUNTOS - PRECIO MEDIO")
+txt[3]
+txt[1]
+cov(datos$PUNTOS,datos$PRECIO)
+# corre<-cor(datos$PUNTOS,datos$PRECIO)
+txt[2]
+corre
+
+# cov_media<-cov(subdatos1$PUNTOS,subdatos1$PRECIO)
+# corre_media<-cor(subdatos1$PUNTOS,subdatos1$PRECIO)
+txt[4]
+txt[1]
+cov_media
+txt[2]
+corre_media
+```
+  
+Existe una clara asociación entre el crecimiento de la puntuación y el del precio, pero se observa que, para cada puntuación, el rango de precios es bastante amplio, lo que indica que la variabilidad en el precio del vino está influida por otros factores además de la puntuación.  
+  
+## Descripción de la variable textual.  
+  
+Se omite en este punto la descripción del preprocesamiento de la variable, proceso implementado en todas las herramientas específicas para _minería de textos_. Únicamente es preciso hacer notar que se ha eliminado la palabra _"wine"_, muy frecuente pero que no aporta información de interés. (No obstante pueden comprobarse las acciones realizadas en los archivos fuente de este trabajo.)  
+  
+### Expresiones mas frecuentes.  
+  
+En primer lugar es necesario identificar las palabras que forman la variable textual _DESCRIPCION_ y contar su frecuencia. Posteriormente realizaremos la misma operación sobre los segmentos repetidos de dos palabras (o _bigramas_).   
+  
+```{r echo=FALSE}
+# todos<-carga_datos_textual(datos,1)
+print(paste("Palabras totales: ",length(todos$word),sep=""))
+print(paste("Términos distintos: ",length(unique(todos$word)),sep=""))
+
+# todos_n<-carga_datos_textual(datos,2)
+print(paste("Bigramas totales: ",length(todos_n$word),sep=""))
+print(paste("Bigramas distintos: ",length(unique(todos_n$word)),sep=""))
+
+```  
+  
+El _corpus_ (conjunto de las reseñas) contiene un total de 2943480 palabras formado por 39278 términos distintos. Contiene asimismo un total de 2900996 bigramas formado por 839177 bigramas distintos.  
+
+```{r echo=FALSE}
+# frecuentes<-terminos_f(todos,.003)
+# frecuentes_n<-terminos_f(todos_n,nrow(frecuentes))
+# 
+# df_fre<-data.frame(frecuentes$TODOS,frecuentes_n$TODOS)
+# colnames(df_fre)<-c("TÉRMINOS","BIGRAMAS")
+df_fre
+
+# gg5<-g_term_freq(todos,"Términos",0,0,30)
+# gg5_n<-g_term_freq(todos_n,"Bigramas",0,0,30)
+grid.arrange(gg5,gg5_n,ncol=2)
+# rm(gg5,gg5_n)
+
+# todos_words_PTOS<- dist_freq_terminos(todos,1)
+# todos_n_words_PTOS<-dist_freq_terminos(todos_n,1)
+# todos_words_PRECIO<- dist_freq_terminos(todos,2)
+# todos_n_words_PRECIO<-dist_freq_terminos(todos_n,2)
+```  
+
+Entre los términos más frecuentes destacan _flavors_, _fruit_, _aromas_, _palate_, _finish_, _acidity_, _tannins_, _drink_, _cherry_, _ripe_ y _black_.  
+Entre los bigramas mas frecuentes destacan _drink now_, _black cherry_, _fruit flavors_, _cabernet sauvignon_, _palate offers_, _ready drink_ y _pinot noir_. 
+  
+### Concordancias.  
+  
+Una vez identificados los términos mas frecuentes es habitual explorar el contexto en el que se utilizan. El estudio de los segmentos repetidos (o n-gramas) proporciona una primera idea acerca de este contexto, pero nos puede interesar identificar otros términos que acompañen en el mismo documento a alguno de los mas frecuentes eliminando el requisito de que aparezcan uno a continuación del otro.  
+  
+Vamos a identificar todos aquellos términos que aparecen junto a alguno de los términos mas frecuentes con un grado de correlación entre ambos de al menos 0.6.  
+  
+```{r echo=FALSE}
+# todos_<-data.frame(ELEMENTO=paste(todos$PAIS,todos$VARIEDAD,todos$PUNTOS,todos$PRECIO,sep="-"),word=todos$word)
+# nuevo_V<-todos_ %>% count(ELEMENTO, word)
+# nuevo_dtm_V<-nuevo_V %>% cast_dtm(ELEMENTO,word,n)
+# socios<-read.csv("socios.csv",row.names=1)
+socios
+```
+  
+El listado esta compuesto por bastantes asociaciones entre términos incluidos en el grupo de los mas frecuentes.  
+  
+```{r echo=FALSE}
+print(paste("Concordancias pertenecientes al conjunto de términos frecuentes: ",nrow(socios[socios$SOCIOS %in% frecuentes$TODOS,]),sep=""))
+```
+
+Vamos a separar estos 43 elementos y observamos el subconjunto resultante.  
+
+```{r echo=FALSE}
+socios[!socios$SOCIOS %in% frecuentes$TODOS,]
+```
+  
+Aparecen dos términos frecuentes que hacen referencia a frutas: el término _apple_, que aparece frecuentemente asociado a _pear_, _lemmon_ y _chardonnay_, y el término _cherry_, que aparece asociado a _cola_ y a _cranberry_.  
+Por su parte el término _tannins_ se asocia al término _firm_, el término _drink_ a _ready_, el término _oak_ a _new_ y el término _blend_ a _sauvignon_.  
+  
+### Medidas estilísticas: ley de Zipf y ley de Heaps.  
+  
+Vamos a representar gráficamente el grado en que el _corpus_ objeto de estudio se ajusta al modelo de distribución de frecuencias de los términos establecido en la ley de Zipf, así como, en cuanto a la riqueza del vocabulario, a la ley de Heaps.  
+
+```{r echo=FALSE}
+par(mfrow=c(1,2))
+Zipf_plot(nuevo_dtm_V,col=rainbow(1),main="Zipf")
+Heaps_plot(nuevo_dtm_V,col=rainbow(1),main="Heaps")
+par(mfrow=c(1,1))
+```
+  
+Observamos un ajuste aceptable. La desviación respecto de la ley de Zipf para los términos mas frecuentes es habitual cuando se estudian textos procedentes de _lenguaje natural_, como es el caso de las reseñas de vinos y, respecto de la riqueza del vocabulario, el ajuste es practicamente perfecto.
+  
+## Vocabulario _vs_ puntuación.  
+  
+Una vez estudiado el _corpus_ lingüístico en su conjunto nos planteamos estudiar una posible relación entre el vocabulario empleado en la reseña y la puntuación del vino.  
+  
+### Expresiones mas frecuentes.  
+  
+Comenzaremos por extraer los términos más frecuentes en los subconjuntos formados con cada categoría de la variable RANGO_PTOS (los términos en un tono de azul más claro corresponden a términos que se encuentran asimismo entre los más frecuentes del conjunto completo).  
+  
+```{r echo=FALSE}
+# frecuentes_Q1<-terminos_f(todos[todos$RANGO_PTOS=="Q1_PTOS",],30)
+# frecuentes_Q2_3<-terminos_f(todos[todos$RANGO_PTOS=="PTOS_MED",],30)
+# frecuentes_Q4<-terminos_f(todos[todos$RANGO_PTOS=="Q4_PTOS",],30)
+# 
+# df_fre_Q<-data.frame(frecuentes_Q1$TODOS,frecuentes_Q2_3$TODOS,frecuentes_Q4$TODOS)
+# colnames(df_fre_Q)<-c("Q1_PTOS","Q2-Q3_PTOS","Q4_PTOS")
+df_fre_Q
+
+# gg6<-g_term_freq(todos,"Términos mas utilizados",0,0,30)
+# gg7<-g_term_freq(todos[todos$RANGO_PTOS=="Q1_PTOS",],"PTOS_80-86",frecuentes,1,30)
+grid.arrange(gg6,gg7,ncol=2)
+# gg8<-g_term_freq(todos[todos$RANGO_PTOS=="PTOS_MED",],"PTOS_87-91",frecuentes,1,30)
+# gg9<-g_term_freq(todos[todos$RANGO_PTOS=="Q4_PTOS",],"PTOS_91-100",frecuentes,1,30)
+grid.arrange(gg8,gg9,ncol=2)
+# rm(gg1,gg2,gg3)
+```
+  
+Es inmediato apreciar algunas diferencias al categorizar los vinos por su puntuación:  
+
+* En los vinos con puntuaciones entre 80 y 86 (primer cuartil) son frecuentes los términos _light_, _green_, _citrus_ y _fruity_  
+
+* En los vinos con puntuacione entre 87-91 (segundo y tercer cuartil) son frecuentes los términos _white_ y _texture_  
+
+* En los vinos con puntuacione entre 91-100 (cuarto cuartil) son frecuentes los términos _dark_, _years_, _texture_, _will_, _cabernet_, _shows_, _pepper_, _firm_ y _well_  
+  
+Representamos ahora los bigramas mas frecuentes para cada categoría de RANGOS_PTOS donde, una vez mas, los términos en tono mas claro corresponden a bigramas que se encuentran entre los mas frecuentes del conjunto total.  
+  
+```{r echo=FALSE}
+# frecuentes_n_Q1<-terminos_f(todos_n[todos_n$RANGO_PTOS=="Q1_PTOS",],30)
+# frecuentes_n_Q2_3<-terminos_f(todos_n[todos_n$RANGO_PTOS=="PTOS_MED",],30)
+# frecuentes_n_Q4<-terminos_f(todos_n[todos_n$RANGO_PTOS=="Q4_PTOS",],30)
+# 
+# df_fre_n_Q<-data.frame(frecuentes_n_Q1$TODOS,frecuentes_n_Q2_3$TODOS,frecuentes_n_Q4$TODOS)
+# 
+# colnames(df_fre_n_Q)<-c("Q1_PTOS","Q2-Q3_PTOS","Q4_PTOS")
+df_fre_n_Q
+
+# gg10_n<-g_term_freq(todos_n,"Bigramas mas utilizados",0,0,30)
+# gg11<-g_term_freq(todos_n[todos_n$RANGO_PTOS=="Q1_PTOS",],"Bigramas_PTOS_80-86",frecuentes_n,1,30)
+grid.arrange(gg10_n,gg11,ncol=2)
+# gg12<-g_term_freq(todos_n[todos_n$RANGO_PTOS=="PTOS_MED",],"Bigramas_PTOS_87-91",frecuentes_n,1,30)
+# gg13<-g_term_freq(todos_n[todos_n$RANGO_PTOS=="Q4_PTOS",],"Bigramas_PTOS_91-100",frecuentes_n,1,30)
+grid.arrange(gg12,gg13,ncol=2)
+# rm(gg1,gg2,gg3)
+```
+
+En cuanto a los bigramas más frecuentes encontramos una situación similar a la de los términos individuales puesto que un conjunto de bigramas se mantienen frecuentes tanto en el conjunto completo de reseñas como al categorizar por RANGO_PTOS, mientras que para cada categoría de esta variable aparecen unos pocos bigramas frecuentes que no lo son tanto en el conjunto total:  
+
+* En los vinos con puntuaciones entre 80 y 86 (primer cuartil) son frecuentes los bigramas _aromas flavors_, _tropical fruit_, _berry fruits_, _red fruits_, _berry aromas_, _spice flavors_, _raspberry cherry_, _citrus flavors_, _tastes like_ y _berry fruit_.  
+
+* En los vinos con puntuaciones entre 87-91 (segundo y tercer cuartil) son frecuentes los bigramas _lead nose_, _white peach_, _black plum_, _fresh acidity_, _open aromas_ y _full bodied_.  
+
+* En los vinos con puntuaciones entre 91-100 (cuarto cuartil) son frecuentes los bigramas _dark chocolare_, _long finish_, _french oak_, _black plum_, _ripe fruit_, _baking spice_, _still young_, _full bodied_ y _wood aging_.  
+
+En este punto podemos afirmar que en las reseñas existen ciertos términos y bigramas que se repiten con una elevada frecuencia siendo asimismo frecuentes al categorizar por puntuación, aunque en este último caso aparecen, para cada categoría, algunos términos muy frecuentes que no lo son tanto en el _corpus_ completo .  
+  
+### Distribución del vocabulario.  
+  
+Los gráficos que se reproducen en este apartado comparan la distribución de términos (y bigramas) entre categorías de la variable RANGO_PTOS. Se ha restringido el número de palabras consideradas a las 500 mas frecuentes del _corpus_ completo con objeto de facilitar la legibilidad del gráfico y focalizar la visualización en las palabras mas frecuentes.  
+  
+Este gráfico se interpreta considerando que las palabras cercanas a la línea tienen frecuencias similares en ambos documentos, mientras que las palabras alejadas de la línea son palabras que se encuentran más en un documento que en el otro.  
+  
+Compararemos los vinos con puntuación en los cuartiles segundo y tercero con los vinos puntuados, respectivamente, en el primer y cuarto cuartil, es decir, compararemos los vinos puntuados entre 87 y 91 puntos frente a los vinos puntuados, por un lado por debajo de 87 puntos, y por otro lado por encima de 91 puntos:
+
+En primer lugar observaremos los términos individuales mas frecuentes.  
+  
+```{r echo=FALSE}
+# todos_tf<-todos[todos$word %in% as.character(terminos_f(todos,500)$TODOS),]
+# 
+# frequency <- todos_tf %>%
+#   count(RANGO_PTOS, word) %>%
+#   group_by(RANGO_PTOS) %>%
+#   mutate(proportion = n / sum(n)) %>%
+#   select(-n) %>%
+#   spread(RANGO_PTOS, proportion) %>%
+#   gather(RANGO_PTOS, proportion, `Q1_PTOS`:`Q4_PTOS`)
+
+ggplot(frequency, aes(x = proportion, y = `PTOS_MED`, color = abs(`PTOS_MED` - proportion))) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), low = "darkslategray4", high = "gray75") +
+  facet_wrap(~RANGO_PTOS, ncol = 2) +
+  theme(legend.position="none") +
+  labs(y = "PTOS_MED", x = NULL)
+
+```
+  
+  Al comparar la categoría que engloba los vinos con puntuación en el primer cuartil con los vinos en los cuartiles segundo y tercero vemos que términos como _short_, _simple_ o _acidic_ están mas representados en los vinos con puntuación mas baja, mientras que términos con _elegant_, _long_, _complex_ o _years_ aparecen con mas frecuencia referidos a vinos con puntuación mas alta.  
+  En los vinos con puntuaciones en el cuartil superior se encuentran con mayor frecuencia términos como _age_, _complex_, _deep_ o _beautiful_ si los comparamos con los vinos con puntuación en el segundo y tercer cuartil, donde aparecen mas frecuentemente términos como _straightforward_, _attractive_ o _simple_.  
+  
+A continuación observamos los bigramas mas frecuentes.  
+  
+```{r echo=FALSE}
+# todos_n_tf<-todos_n[todos_n$word %in% as.character(terminos_f(todos_n,500)$TODOS),]
+# 
+# frequency_n<- todos_n_tf %>%
+#   count(RANGO_PTOS, word) %>%
+#   group_by(RANGO_PTOS) %>%
+#   mutate(proportion = n / sum(n)) %>%
+#   select(-n) %>%
+#   spread(RANGO_PTOS, proportion) %>%
+#   gather(RANGO_PTOS, proportion, `Q1_PTOS`:`Q4_PTOS`)
+
+ggplot(frequency_n, aes(x = proportion, y = `PTOS_MED`, color = abs(`PTOS_MED` - proportion))) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), low = "darkslategray4", high = "gray75") +
+  facet_wrap(~RANGO_PTOS, ncol = 2) +
+  theme(legend.position="none") +
+  labs(y = "PTOS_MED", x = NULL)
+
+```
+  
+  Respecto de los bigramas, entre los vinos con puntuaciones mas bajas son mas frecuentes, al compararlos con los vinos puntuados en los cuartiles intermedios, expresiones como _apple aromas_, _flavors finishes_ o _cherry jam_, mientras que en los últimnos prevalecen son mas frecuentes _finegrained tannins_, _polished tannins_ o _alongside firm_.  
+  La diferencia entre los vinos con puntuaciones en el cuartil superior y los puntuados en los cuartiles intermedios se aprecia en la prevalencia en el primer grupo de expresiones como _age well_, _blackberries black_ o _many years_ frente a _enjoy soon_, _drink soon_ u _offers dried_, mas frecuentes en el segundo grupo.  
+  
+### Expresiones característicos.  
+  
+Vamos ahora a identificar las expresiones mas características para cada categoría de la variable RANGO_PTOS mediante el cálculo de _tf-idf_.  
+  
+En primer lugar observamos los resultados obtenidos respecto de los términos individuales:  
+  
+```{r echo=FALSE}
+# todos_words_PTOS <- todos_words_PTOS %>%
+#   bind_tf_idf(word, RANGO_PTOS, n)
+# 
+# terminos_tf_idf_PTOS<-todos_words_PTOS %>%
+#   arrange(desc(tf_idf)) %>%
+#   mutate(word = factor(word, levels = rev(unique(word)))) %>%
+#   group_by(RANGO_PTOS) %>%
+#   top_n(25)
+
+terminos_tf_idf_PTOS %>%
+  ungroup() %>%
+  ggplot(aes(word, tf_idf, fill = RANGO_PTOS)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~RANGO_PTOS, ncol = 3, scales = "free") +
+  coord_flip()
+
+```
+  
+Inmediatamente apreciamos la diferencia respecto de los términos frecuentes obtenidos respecto del corpus completo, y la diversidad de términos entre las distintas categorias de RANGO_PTOS.  
+  
+Observaremos ahora los resultados obtenidos para los bigramas:  
+  
+```{r echo=FALSE}
+# todos_n_words_PTOS <- todos_n_words_PTOS %>%
+#   bind_tf_idf(word, RANGO_PTOS, n)
+# 
+# terminos_n_tf_idf_PTOS<-todos_n_words_PTOS %>%
+#   arrange(desc(tf_idf)) %>%
+#   mutate(word = factor(word, levels = rev(unique(word)))) %>%
+#   group_by(RANGO_PTOS) %>%
+#   top_n(30)
+
+terminos_n_tf_idf_PTOS %>%
+  ungroup() %>%
+  ggplot(aes(word, tf_idf, fill = RANGO_PTOS)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~RANGO_PTOS, ncol = 3, scales = "free") +
+  coord_flip()
+
+```
+De la observación detenida de los bigramas característicos se pueden extraer algunas conclusiones interesantes.  
+  
+En primer lugar destaca el hecho de que a simple vista no se aprecia apenas coincidencia con los bigramas frecuentes calculados para cada uno de los grupos.  
+  
+En el grupo de vinos con menos puntos (Q1_PTOS) destaca en varios bigramas la presencia del término _simple_ aun cuando no se trata de un término frecuente ni característico de este grupo. La primera conclusión es que el adjetivo _simple_ caracteriza un buen número de vinos que obtienen bajas puntuaciones. Por otra parte, algunos bigramas se solapan con el grupo PTOS_MED, como _short finish_ o _straightforward palate_. A su vez este grupo PTOS_MED se solapa en algunos bigramas con el grupo Q4_PTOS de los vinos mejor puntuados, como _firm polished_ y _firm finegrained_. Por último el grupo de vinos mejor puntuados se caracteriza por el empleo de términos como _elegant_, _structured_ o _delicious_, ausentes en los otros grupos y que muestran un salto cualitativo en estos vinos a través del propio lenguaje empleado para reseñarlos.
+  
+## Vocabulario _vs_ precio.  
+  
+A continuación vamos a repetir el estudio realizado respecto de la puntuación de los vinos con las categorías de la variable RANGO_PRECIO con la intención de descubrir una posible relación entre el vocabulario empleado en la reseña y el precio del vino.  
+  
+### Expresiones mas frecuentes.  
+  
+Como en el caso anterior, comenzaremos por extraer los términos más frecuentes en los subconjuntos formados con cada categoría de la variable RANGO_PRECIO (una vez mas los términos en un tono de azul más claro corresponden a términos que se encuentran asimismo entre los más frecuentes del conjunto completo).  
+
+```{r echo=FALSE}
+# frecuentes_BARATO<-terminos_f(todos[todos$RANGO_PRECIO=="BARATO",],30)
+# frecuentes_PRECIO_MED<-terminos_f(todos[todos$RANGO_PRECIO=="PRECIO_MED",],30)
+# frecuentes_CARO<-terminos_f(todos[todos$RANGO_PRECIO=="CARO",],30)
+# 
+# df_fre_PRECIO<-data.frame(frecuentes_BARATO$TODOS,frecuentes_PRECIO_MED$TODOS,frecuentes_CARO$TODOS)
+# colnames(df_fre_PRECIO)<-c("BARATO","PRECIO MEDIO","CARO")
+df_fre_PRECIO
+
+# gg14<-g_term_freq(todos,"Términos mas utilizados",0,0,30)
+# gg15<-g_term_freq(todos[todos$RANGO_PRECIO=="BARATO",],"BARATO",frecuentes,1,30)
+grid.arrange(gg14,gg15,ncol=2)
+# gg16<-g_term_freq(todos[todos$RANGO_PRECIO=="PRECIO_MED",],"PRECIO MEDIO",frecuentes,1,30)
+# gg17<-g_term_freq(todos[todos$RANGO_PRECIO=="CARO",],"CARO",frecuentes,1,30)
+grid.arrange(gg16,gg17,ncol=2)
+# rm(gg1,gg2,gg3)
+```
+  
+Categorizando los vinos por su precio observamos las siguientes diferencias:  
+
+* En los vinos mas baratos (en el primer cuartil de precios para vinos con la misma puntuación) son frecuentes los términos _citrus_, _white_, _texture_, _light_ y _bright_.  
+
+* En los vinos con precios en el segundo y tercer cuartil de precios para vinos con la misma puntuación es frecuente únicamente el término _white_.  
+
+* En los vinos mas caros (en el cuarto cuartil de precios para vinos con la misma puntuación) son frecuentes los términos _cabernet_, _dark_, _shows_ y _vanilla_.  
+  
+Representaremos ahora los bigramas mas frecuentes para las categorías de la variable RANGOS_PRECIO y de nuevo los bigramas en tono mas claro corresponden a aquellos que se encuentran entre los mas frecuentes del conjunto total.  
+  
+```{r echo=FALSE}
+# frecuentes_n_BARATO<-terminos_f(todos_n[todos_n$RANGO_PRECIO=="BARATO",],30)
+# frecuentes_n_PRECIO_MED<-terminos_f(todos_n[todos_n$RANGO_PRECIO=="PRECIO_MED",],30)
+# frecuentes_n_CARO<-terminos_f(todos_n[todos_n$RANGO_PRECIO=="CARO",],30)
+# 
+# df_fre_n_PRECIO<-data.frame(frecuentes_n_BARATO$TODOS,frecuentes_n_PRECIO_MED$TODOS,frecuentes_n_CARO$TODOS)
+# colnames(df_fre_n_PRECIO)<-c("BARATO","PRECIO MEDIO","CARO")
+df_fre_n_PRECIO
+
+# gg0<-g_term_freq(todos_n,"Bigramas mas utilizados",0,0,30)
+# gg18<-g_term_freq(todos_n[todos_n$RANGO_PRECIO=="BARATO",],"Bigramas_BARATO",frecuentes_n,2,30)
+grid.arrange(gg10_n,gg18,ncol=2)
+# gg19<-g_term_freq(todos_n[todos_n$RANGO_PRECIO=="PRECIO_MED",],"Bigramas_PRECIO_MED",frecuentes_n,2,30)
+# gg20<-g_term_freq(todos_n[todos_n$RANGO_PRECIO=="CARO",],"Bigramas_CARO",frecuentes_n,2,30)
+grid.arrange(gg19,gg20,ncol=2)
+# rm(gg1,gg2,gg3)
+```
+
+Se repite de nuevo una situación similar a la de los términos individuales: un conjunto de bigramas se mantienen frecuentes tanto en el conjunto completo de reseñas como al categorizar por RANGO_PRECIOS, mientras que para cada una de las categorías aparecen unos pocos bigramas frecuentes que no lo son tanto en el conjunto total:  
+
+* En los vinos mas baratos (en el primer cuartil de precios para vinos con la misma puntuación) son frecuentes los bigramas _white peach_, _berry fruits_, _tropical fruit_, _aromas flavors_, _berry aromas_, _red fruits_ y _fresh acidity_.  
+
+* En los vinos con precios en el segundo y tercer cuartil de precios para vinos con la misma puntuación son frecuentes los bigramas _tropica fruit_, _fresh acidity_ y _black plum_.  
+
+* En los vinos mas caros (en el cuarto cuartil de precios para vinos con la misma puntuación) son frecuentes los bigramas _french oak_, _opens aromas_, _dark chocolate_, _lead nose_, _blend cabernet_, _full bodied_, _ripe fruit_, _oak flavors_ y _black plum_.  
+
+Podemos afirmar, tal y como hicimos al categorizar por puntuación, que existen ciertas expresiones que se repiten con una elevada frecuencia y son asimismo muy frecuentes al categorizar por el precio, aunque en este último caso aparecen otras expresiones frecuentes que no lo son tanto en el _corpus_ completo .  
+  
+### Distribución del vocabulario.  
+  
+Vamos a comparar ahora los vinos con precio en los cuartiles segundo y tercero entre los de su misma puntuación frente a, respectivamente, los encuadrados en el cuartil inferior y en el cuartil superior:  
+  
+En primer lugar observaremos los términos individuales mas frecuentes.  
+  
+```{r echo=FALSE}
+# frequency_PRECIO <- todos_tf %>%
+#   count(RANGO_PRECIO, word) %>%
+#   group_by(RANGO_PRECIO) %>%
+#   mutate(proportion = n / sum(n)) %>%
+#   select(-n) %>%
+#   spread(RANGO_PRECIO, proportion) %>%
+#   gather(RANGO_PRECIO, proportion, `BARATO`:`CARO`)
+
+ggplot(frequency_PRECIO, aes(x = proportion, y = `PRECIO_MED`, color = abs(`PRECIO_MED` - proportion))) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), low = "darkslategray4", high = "gray75") +
+  facet_wrap(~RANGO_PRECIO, ncol = 2) +
+  theme(legend.position="none") +
+  labs(y = "PRECIO_MED", x = NULL)
+
+```
+  
+Se observa que, al categorizar por precio, los 500 términos mas frecuentes del _corpus_ se encuentran en general muy cercanos a la línea, lo que indica que no existen grandes diferencias en cuanto a su frecuencia de empleo en las reseñas de cada una de las categorías. Tan solo es destacable, en el primer caso (comparar vinos considerados baratos dentro de su nivel de puntuación frente a vinos considerados de precio normal) el término _price_ que se aleja algo más, indicando una mayor frecuencia para reseñar los vinos baratos.  
+
+A continuación observamos los bigramas mas frecuentes.  
+  
+```{r echo=FALSE}
+# frequency_n_PRECIO<- todos_n_tf %>%
+#   count(RANGO_PRECIO, word) %>%
+#   group_by(RANGO_PRECIO) %>%
+#   mutate(proportion = n / sum(n)) %>%
+#   select(-n) %>%
+#   spread(RANGO_PRECIO, proportion) %>%
+#   gather(RANGO_PRECIO, proportion, `BARATO`:`CARO`)
+
+ggplot(frequency_n_PRECIO, aes(x = proportion, y = `PRECIO_MED`, color = abs(`PRECIO_MED` - proportion))) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), low = "darkslategray4", high = "gray75") +
+  facet_wrap(~RANGO_PRECIO, ncol = 2) +
+  theme(legend.position="none") +
+  labs(y = "PRECIO_MED", x = NULL)
+
+```
+  
+  Tal y como hemos observado en relación a los términos individuales, al comparar la distribución de frecuencias de los bigramas entre las categorías de precio apreciamos que se encuentran bastante agrupados en torno a la línea (aunque algo menos al comparar los vinos mas caros con los de precios intermedios) sin que merezca ser destacado ningún bigrama.  
+  
+### Expresiones características.  
+  
+Procederemos a identificar las expresiones mas características para cada categoría de la variable RANGO_PRECIO mediante el cálculo de _tf-idf_.  
+  
+En primer lugar observamos los resultados obtenidos respecto de los términos individuales:  
+  
+```{r echo=FALSE}
+# todos_words_PRECIO <- todos_words_PRECIO %>%
+#   bind_tf_idf(word, RANGO_PRECIO, n)
+# 
+# terminos_tf_idf_PRECIO<-todos_words_PRECIO %>%
+#   arrange(desc(tf_idf)) %>%
+#   mutate(word = factor(word, levels = rev(unique(word)))) %>%
+#   group_by(RANGO_PRECIO) %>%
+#   top_n(30)
+
+terminos_tf_idf_PRECIO %>%
+  ungroup() %>%
+  ggplot(aes(word, tf_idf, fill = RANGO_PRECIO)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~RANGO_PRECIO, ncol = 3, scales = "free") +
+  coord_flip()
+
+```
+  
+Observaremos ahora los resultados obtenidos para los bigramas:  
+  
+```{r echo=FALSE}
+# todos_n_words_PRECIO <- todos_n_words_PRECIO %>%
+#   bind_tf_idf(word, RANGO_PRECIO, n)
+# 
+# terminos_n_tf_idf_PRECIO<-todos_n_words_PRECIO %>%
+#   arrange(desc(tf_idf)) %>%
+#   mutate(word = factor(word, levels = rev(unique(word)))) %>%
+#   group_by(RANGO_PRECIO) %>%
+#   top_n(30)
+
+terminos_n_tf_idf_PRECIO %>%
+  ungroup() %>%
+  ggplot(aes(word, tf_idf, fill = RANGO_PRECIO)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~RANGO_PRECIO, ncol = 3, scales = "free") +
+  coord_flip()
+
+```
+  
+De nuevo, como ya observamos respecto de los bigramas característicos de las categorias por puntuación, a simple vista no se aprecia apenas coincidencia con los bigramas frecuentes calculados para cada una de las categorías de precio.  
+  
+Al contrario que en el caso de las categorías de puntuación, en cuanto a las categorías de precio no obtenemos conclusiones tan evidentes de la observación de los bigramas, aunque se puede destacar que, en el grupo de vinos considerados BARATOS dentro de su nivel de puntuación, destaca la presencia de términos como _light_ y _lightly_, _price_ y _value_.  
+  
+## Análisis de correspondencias.  
+  
+A continuación vamos a analizar la relación entre el vocabulario y las puntuaciones y precios de los vinos desde la perspectiva del análisis multivariante empleando la metodología del _Análisis de Correspondencias_. Es necesario, en primer lugar, construir la correspondiente tabla léxica agregada. Para la construcción de esta tabla vamos a considerar una nueva categorización de los datos textuales denominada NUEVO_RANGO y en la que, simplemente agregaremos las categorias de RANGO_PRECIO a cada categoría de RANGO_PTOS, de manera que resultarán las siguientes categorías:  
+  
+* Q1_PTOS - BARATO  
+* Q1_PTOS - PRECIO_MED  
+* Q1_PTOS - CARO  
+* PTOS_MED - BARATO  
+* PTOS_MED - PRECIO_MED  
+* PTOS_MED - CARO  
+* Q4_PTOS - BARATO  
+* Q4_PTOS - PRECIO_MED  
+* Q4_PTOS - CARO  
+
+Realizamos el análisis de correspondencias sobre la tabla léxica agregada así construida y obtenemos los siguientes resultados:  
+
+```{r echo=FALSE}
+# todos$NUEVO_RANGO<-paste(todos$RANGO_PTOS,todos$RANGO_PRECIO,sep=" - ")
+# nuevo_V<-todos[,c(8,7)] %>% count(NUEVO_RANGO, word)
+# nuevo_dtm_V<-nuevo_V %>% cast_dtm(NUEVO_RANGO,word,n)
+# 
+# matriz_V<-as.matrix(nuevo_dtm_V)
+# res_CA<-CA(matriz_V,graph=F)
+res_CA$eig
+res_CA$row$contrib
+```
+
+El análisis de los valores propios obtenidos muestra que los valores propios son muy débiles, situación habitual en el análisis de una tabla léxica agregada, puesto que una gran parte del vocabulario es compartida por las distintas categorías. El porcentaje de varianza expresado en la segunda columna indica que el primer eje conserva un 36.82 % de la varianza total, mientras que el segundo conserva solamente el 18.75 %. En conjunto, el plano formado por los dos primeros ejes conserva el 55.57 % de la varianza total, porcentaje mas que aceptable para el problema que estamos tratando.  
+Al observar la contribución de las categorías en la construcción de los ejes resulta que, para el primer eje, las mayores contribuciones las realizan las categorías PRECIO_MED y BARATO de Q1_PTOS, seguidas por PRECIO_MED y CARO de Q4_PTOS. A continuación contribuyen en menor medida BARATO de Q4_PTOS y CARO de Q1_PTOS. Las categorías que menos contribuyen en este eje son todas las correspondientes a PTOS_MED (BARATO,PRECIO_MED,CARO). Parece evidente que el primer eje separación los documentos en función de la puntuación del vino. Para el segundo eje las diferencias en la contribución de las categorías son menores y a priori no es fácil detectar el criterio de separación.  
+
+Veamos la representación de las categorías sobre el plano formado por los dos primeros ejes:  
+
+```{r echo=FALSE}
+CA_plot_FILAS<-plot.CA(res_CA,invisible="col",label="row",title="Categorías",cex=.5)
+```
+Con la visualización del gráfico se aprecia respecto del segundo eje que las categorías se ordenan en función del precio con los vinos clasificados como baratos en la parte superior del gráfico, los vinos de precio intermedio en la parte central y los vinos caros en la parte inferior.  
+El primer eje, como indicaba el análisis de los valores propios ordena los vinos en función de la puntuación obtenida, con los vinos en el cuartil inferior de puntuaciones en la parte izquierda, los vinos en los cuartiles centrales en la parte central del gráfico y los vinos del cuartil superior en la parte derecha.  
+
+Las representaciones de los términos y de los bigramas sobre los dos primeros ejes son:  
+
+```{r echo=FALSE}
+par(mfrow=c(1,2))
+CA_plot_COLUMNAS<-plot.CA(res_CA,invisible="row",label="row",title="TÉRMINOS",col.col="blue")
+CA_plot_COLUMNAS_n<-plot.CA(res_CA_n,invisible="row",label="row",title="BIGRAMAS")
+```
+  
+El número de expresiones características, tanto términos individuales como bigramas, es demasiado elevado para realizar ninguna interpretación directa. Ante esta situación, vamos a representar las expresiones características de las distintas categorías establecidas en las variables RANGO_PTOS y RANGO_PRECIO sobre los dos primeros ejes.  
+  
+En primer lugar representaremos las expresiones que caracterizan a la categoría Q1_PTOS, es decir, a los vinos con puntuaciones en el cuartil inferior (entre 80 y 86 puntos).   
+
+```{r echo=FALSE}
+CA_plot_Q1<-plot.CA(res_CA,invisible="row",label="row",col.col="blue",title="TÉRMINOS",cex=.5,
+                    selectCol = c(as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="Q1_PTOS",]$word)),
+                    unselect=1)
+CA_plot_Q1_n<-plot.CA(res_CA_n,invisible="row",label="row",cex=.5,
+                      title="BIGRAMAS",
+                      selectCol = c(as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="Q1_PTOS",]$word)),
+                      unselect=1)
+
+```
+  
+Todos los términos y bigramas que caracterizan esta categoría se situan, respecto del primer eje, en valores negativos.  
+  
+Observemos ahora las expresiones que caracterizan a la categoría Q4_PTOS, es decir, a los vinos con puntuaciones en el cuartil superior (entre 92 y 100 puntos).  
+
+```{r echo=FALSE}
+CA_plot_Q4<-plot.CA(res_CA,invisible="row",label="row",col.col="blue",
+          cex=.5,title="TÉRMINOS",
+          selectCol = c(as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="Q4_PTOS",]$word)),
+          unselect=1)
+
+CA_plot_Q4_n<-plot.CA(res_CA_n,invisible="row",label="row",
+                    cex=.5,title="BIGRAMAS",
+                    selectCol = c(as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="Q4_PTOS",]$word)),
+                    unselect=1)
+
+```
+En este caso todos los términos y bigramas que caracterizan los vinos con puntuaciones mas altas se sitúan, respecto del primer eje, en valores positivos, en contraposición a los términos que caracterizan los vinos con puntuaciones mas bajas.  
+Por último representamos las expresiones características de la categoría PTOS_MED, es decir de los vinos con puntuaciones intermedias (entre 87 y 91 puntos).  
+
+```{r echo=FALSE}
+
+CA_plot_PTOS_MED<-plot.CA(res_CA,invisible="row",label="row",cex=.5,title="TÉRMINOS",col.col="blue",
+          selectCol = c(as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="PTOS_MED",]$word)),
+          unselect=1)
+
+
+CA_plot_PTOS_MED_n<-plot.CA(res_CA_n,invisible="row",label="row",cex=.5,title="BIGRAMAS",
+                          selectCol = c(as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="PTOS_MED",]$word)),
+                          unselect=1)
+
+```
+
+Las expresiones que caracterizan a los vinos con puntuaciones intermedias se situan, respecto del primer eje, en una posición central, agrupados en un pequeño intervalo en torno a cero.  
+  
+En definitiva podemos concluir que el primer eje ordena los términos y los bigramas del _corpus_ en función de su uso característico asociado a la puntuación del vino, con los términos que caracterizan a los vinos con menores puntuaciones en valores negativos y los términos que caracterizan a los vinos con mejores puntuaciones en valores positivos.  
+
+Respecto del segundo eje no se aprecian diferencias considerables en cuanto a la posición de las expresiones características de ninguna de las categorías relacionadas con la puntuación.  
+  
+Veamos a continuación la representación sobre el plano formado por los dos primeros ejes de las expresiones que caracterizan los vinos por la variable RANGO_PRECIO. Comenzamos con los vinos clasificados como BARATOS, es decir, aquellos que, para su puntuación se encuentran en el cuartil inferior de precios.  
+  
+```{r echo=FALSE}
+
+CA_plot_BARATOS<-plot.CA(res_CA,invisible="row",label="row",cex=.5,title="TÉRMINOS",col.col="blue",
+        selectCol = c(as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="BARATO",]$word)),
+        unselect=1)
+
+CA_plot_BARATOS_n<-plot.CA(res_CA_n,invisible="row",label="row",cex=.5,title="BIGRAMAS",
+                         selectCol = c(as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="BARATO",]$word)),
+                         unselect=1)
+
+```
+  
+En este caso todos los términos y bigramas que caracterizan a los vinos clasificados como baratos se situan, respecto del segundo eje, en valores positivos.  
+
+A continuación representamos las expresiones características de los vinos clasificados como CAROS, es decir, los vinos cuyo precio se sitúa en el cuartil superior entre los de su misma puntuación.  
+
+```{r echo=FALSE}
+
+CA_plot_CAROS<-plot.CA(res_CA,invisible="row",label="row",cex=.5,title="TÉRMINOS",col.col="blue",
+      selectCol = c(as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="CARO",]$word)),
+      unselect=1)
+
+CA_plot_CAROS_n<-plot.CA(res_CA_n,invisible="row",label="row",cex=.5,title="BIGRAMAS",
+                       selectCol = c(as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="CARO",]$word)),
+                       unselect=1)
+
+```
+
+Para estos vinos las expresiones mas características se sitúan, respecto del segundo eje, en valores negativos.  
+
+Por último representamos las expresiones características de la categoría PRECIO_MED, es decir, el conjunto de vinos con precios intermedias dentro de su nivel de puntuación.  
+
+```{r echo=FALSE}
+CA_plot_PRECIO_MED<-plot.CA(res_CA,invisible="row",label="row",cex=.5,title="TÉRMINOS",col.col="blue",
+    selectCol = c(as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="PRECIO_MED",]$word)),
+    unselect=1)
+
+CA_plot_PRECIO_MED_n<-plot.CA(res_CA_n,invisible="row",label="row",cex=.5,title="BIGRAMAS",
+                            selectCol = c(as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="PRECIO_MED",]$word)),
+                            unselect=1)
+```
+
+Las expresiones que categorizan a los vinos con precios intermedios dentro de cada puntuación se situan en la parte central del gráfico, agrupadas en torno al valor cero respecto del segundo eje.  
+
+# Conclusiones finales
+
+A la vista de estas representaciones podemos decir que el vocabulario empleado en las reseñas de los vinos caracteriza en buena medida el precio y la puntuación del vino en cuanto a los criterios establecidos en este trabajo, es decir, si el vino se encuentra entre el 25 % de los vinos con puntuación mas baja, el 50 % central o al 25 % con puntuación más alta, y por otra parte, si el precio del vino está, para su puntuación, entre el 25 % de los vinos con precios mas bajos, enrtre el 50 % central, o entre el 25 % de los vinos mas caros. Los términos que mejor caracterizan estas situaciones son, respectivamente:  
+  
+  
+```{r echo=FALSE}
+txt_PTOS<-c("Vinos con puntuación entre 80 y 86 puntos",
+       "Vinos con puntuación entre 87 y 91 puntos",
+       "Vinos con puntuación entre 92 y 100 puntos")
+txt_PRECIO<-c("Vinos con precio inferior al 50 % de precios centrales a igual puntuación",
+       "Vinos con precio en el 50 % central a igual puntuación",
+       "Vinos con precio superior al 50 % de precios centrales a igual puntuación")
+
+titulos<-c("TÉRMINOS","BIGRAMAS")
+
+txt_PTOS[1]
+titulos[1]
+as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="Q1_PTOS",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="Q1_PTOS",]$word)
+```
+  
+  
+```{r echo=FALSE}
+
+txt_PTOS[2]
+titulos[1]
+as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="PTOS_MED",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="PTOS_MED",]$word)
+```
+  
+  
+```{r echo=FALSE}
+txt_PTOS[3]
+titulos[1]
+as.character(terminos_tf_idf_PTOS[terminos_tf_idf_PTOS$RANGO_PTOS=="Q4_PTOS",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PTOS[terminos_n_tf_idf_PTOS$RANGO_PTOS=="Q4_PTOS",]$word)
+```
+  
+  
+```{r echo=FALSE}
+txt_PRECIO[1]
+titulos[1]
+as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="BARATO",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="BARATO",]$word)
+```
+  
+  
+```{r echo=FALSE}
+txt_PRECIO[2]
+titulos[1]
+as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="PRECIO_MED",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="PRECIO_MED",]$word)
+```
+  
+  
+```{r echo=FALSE}
+txt_PRECIO[3]
+titulos[1]
+as.character(terminos_tf_idf_PRECIO[terminos_tf_idf_PRECIO$RANGO_PRECIO=="CARO",]$word)
+titulos[2]
+as.character(terminos_n_tf_idf_PRECIO[terminos_n_tf_idf_PRECIO$RANGO_PRECIO=="CARO",]$word)
+
+```
+
+
+  
+\newpage  
+
+[^1]: _hapax_: término que cuenta con una única aparición en un texto.  
+[^2]: _estilistas_: especialistas en lingüística que intentan caracterizar los estilos de escritura de diversas obras.
+[^3]: _lema_: entrada del diccionario asociada a una palabra.  
+[^4]: _stematización_: neologismo formado a partir de _stem_, que en inglés significa raíz.  
+[^5]: Entiendase individuo en sentido amplio en el contexto adecuado, por ejemplo, en el estudio de encuestas con respuesta abierta será cada una de las respuestas individuales, en el caso de un corpus formado por varios documentos, cada uno de los documentos individuales, etc  
+[^6]: _Kaggle_: Portal web especializado en "_Ciencia de datos_".  
+
+# Bibliografía  
